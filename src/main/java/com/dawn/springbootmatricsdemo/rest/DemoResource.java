@@ -1,6 +1,8 @@
 package com.dawn.springbootmatricsdemo.rest;
 
+import com.dawn.springbootmatricsdemo.model.Dog;
 import com.dawn.springbootmatricsdemo.rest.error.AgeNotInRangeException;
+import com.dawn.springbootmatricsdemo.utils.ObjectSizeFetcher;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -77,4 +79,25 @@ public class DemoResource {
         DogsNames.add(name);
         return DogsNames;
     }
+
+    @GetMapping("/dog/{id}")
+    public Dog getDog(@PathVariable Long id){
+
+        Dog dog = new Dog("Rexy", "Amstaff", "John Smith");
+
+        long objectSize = 0;
+
+        try {
+            objectSize = ObjectSizeFetcher.getObjectSize(dog);
+        }
+        catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
+
+        registry.summary("dog.object.size")
+                .record((double) objectSize);
+
+        return dog;
+    }
+
 }
